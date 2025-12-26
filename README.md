@@ -34,38 +34,38 @@ The system handles **text, tables, and images (via OCR)** and produces context-a
 
 ## 🏗️ Architecture Overview
 
-PDF Document
-↓
-Ingestion (text / tables / images + OCR)
-↓
-Chunking (modality-aware)
-↓
-Embeddings
-↓
-Vector Store (FAISS)
-↓
-Retriever
-↓
-LLM (Gemini Flash Lite)
-↓
+PDF Document  
+↓  
+Ingestion (text / tables / images + OCR)  
+↓  
+Chunking (modality-aware)  
+↓  
+Embeddings  
+↓  
+Vector Store (FAISS)  
+↓  
+Retriever  
+↓  
+LLM (Gemini Flash Lite)  
+↓  
 Context-grounded Answer
 
 ---
 
 ## 📁 Project Structure
 
-multi-modal-document-intelligence/
-│
-├── ingestion/ # pdf parsing, text, table, image extraction
-├── chunking/ # modality-aware chunking logic
-├── embeddings/ # embedding model wrapper
-├── retrieval/ # vector store and retriever
-├── qa/ # answer generation using llm
-├── app/ # streamlit chat application
-├── data/ # sample documents
-├── main.py # end-to-end pipeline test
-├── requirements.txt
-├── README.md
+multi-modal-document-intelligence/  
+│  
+├── ingestion/ # pdf parsing, text, table, image extraction  
+├── chunking/ # modality-aware chunking logic  
+├── embeddings/ # embedding model wrapper  
+├── retrieval/ # vector store and retriever  
+├── qa/ # answer generation using llm  
+├── app/ # streamlit chat application  
+├── data/ # sample documents  
+├── main.py # end-to-end pipeline test  
+├── requirements.txt  
+├── README.md  
 └── .gitignore
 
 ---
