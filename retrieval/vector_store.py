@@ -8,7 +8,6 @@ class VectorStore:
     """
 
     def __init__(self, embedding_dim: int):
-        # Using cosine similarity via normalized vectors + inner product
         self.index = faiss.IndexFlatIP(embedding_dim)
         self.metadata = []
 

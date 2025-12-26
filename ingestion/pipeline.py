@@ -11,13 +11,10 @@ def ingest_document(pdf_path):
     doc = fitz.open(pdf_path)
 
     for page in pages:
-        # Text
         documents.extend(extract_text(page))
 
-        # Tables
         documents.extend(extract_tables(pdf_path, page.page_number))
 
-        # Images + OCR
         documents.extend(extract_images_with_ocr(doc, page))
 
     return documents

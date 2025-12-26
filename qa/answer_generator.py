@@ -1,19 +1,48 @@
-import requests
+import os
+from dotenv import load_dotenv
+from google import genai
 
+load_dotenv()
 
-def build_prompt(question, retrieved_chunks):
+client = genai.Client(
+    api_key=os.getenv("GEMINI_API_KEY")
+)
+
+def generate_answer(question, retrieved_chunks, doc_keywords=None):
     """
-    Build a grounded prompt using retrieved context.
+    Generate a grounded answer using Gemini Flash Lite.
+    Works for any document type (general-purpose RAG).
     """
-    context = ""
+
+    if not retrieved_chunks:
+        return "I don't know based on the provided document."
+
+    context_blocks = []
+
     for i, chunk in enumerate(retrieved_chunks, 1):
-        context += f"[Source {i} | Page {chunk['page']} | {chunk['modality']}]\n"
-        context += chunk["content"] + "\n\n"
+        context_blocks.append(
+            f"[Source {i} | Page {chunk['page']} | {chunk['modality']}]\n"
+            f"{chunk['content']}"
+        )
+
+    context = "\n\n".join(context_blocks)
 
     prompt = f"""
-You are a factual assistant.
-Answer the question using ONLY the sources below.
-If the answer is not contained in the sources, say "I don't know".
+You are a document-grounded assistant.
+
+Answer the user's question using ONLY the sources below.
+Do NOT use outside knowledge.
+
+Rules:
+- If the sources contain tables, figures, or numeric values,
+  summarize overall patterns or trends in words.
+- If the sources provide partial or indirect information,
+  generate a cautious, high-level answer explaining what can
+  reasonably be inferred.
+- Use uncertainty-aware language (e.g., "the document suggests",
+  "based on available information").
+- Do NOT invent facts or numbers.
+- Do NOT refuse unless the sources are completely unrelated.
 
 Question:
 {question}
@@ -21,26 +50,20 @@ Question:
 Sources:
 {context}
 
-Answer (cite sources like [Source 1]):
+Answer:
 """
-    return prompt
+    try:
+        response = client.models.generate_content(
+            model="gemini-2.5-flash-lite",
+            contents=prompt
+        )
 
+        answer = response.text.strip()
 
-def generate_answer(question, retrieved_chunks):
-    """
-    Generate answer using a local Ollama LLM.
-    """
-    prompt = build_prompt(question, retrieved_chunks)
+        if not answer:
+            return "I don't know based on the provided document."
 
-    response = requests.post(
-        "http://localhost:11434/api/generate",
-        json={
-            "model": "mistral",
-            "prompt": prompt,
-            "stream": False
-        },
-        timeout=300
-    )
+        return answer
 
-    response.raise_for_status()
-    return response.json()["response"]
+    except Exception as e:
+        return f"Error generating answer: {e}"

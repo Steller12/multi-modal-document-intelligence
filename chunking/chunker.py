@@ -3,9 +3,6 @@ def split_text(
     chunk_size: int = 400,
     overlap: int = 50
 ):
-    """
-    Split text into overlapping word-based chunks.
-    """
     words = text.split()
     chunks = []
 
@@ -27,16 +24,12 @@ def split_text(
 
 
 def chunk_records(records):
-    """
-    Apply modality-aware chunking.
-    """
     chunked_records = []
 
     for record in records:
         modality = record["modality"]
         content = record["content"]
 
-        # --- TEXT ---
         if modality == "text":
             chunks = split_text(
                 content,
@@ -49,7 +42,6 @@ def chunk_records(records):
                 new_record["content"] = chunk
                 chunked_records.append(new_record)
 
-        # --- IMAGE (OCR TEXT) ---
         elif modality == "image":
             chunks = split_text(
                 content,
@@ -62,9 +54,7 @@ def chunk_records(records):
                 new_record["content"] = chunk
                 chunked_records.append(new_record)
 
-        # --- TABLE ---
         else:
-            # Tables are kept intact
             chunked_records.append(record)
 
     return chunked_records

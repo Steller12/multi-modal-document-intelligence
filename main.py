@@ -1,4 +1,3 @@
-# main.py
 import os
 
 from ingestion.pipeline import ingest_document
@@ -8,64 +7,59 @@ from retrieval.vector_store import VectorStore
 from retrieval.retriever import Retriever
 from qa.answer_generator import generate_answer
 
-# --------------------------------------------------
-# 1. Path setup
-# --------------------------------------------------
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-PDF_PATH = os.path.join(BASE_DIR, "data", "qatar_test_doc.pdf")
 
-# --------------------------------------------------
-# 2. Ingest document (Day 1)
-# --------------------------------------------------
-print("\n[1] Ingesting document...")
-records = ingest_document(PDF_PATH)
-print(f"Extracted {len(records)} records")
+# set paths
+base_dir = os.path.dirname(os.path.abspath(__file__))
+pdf_path = os.path.join(base_dir, "data", "qatar_test_doc.pdf")
 
-# --------------------------------------------------
-# 3. Chunk records (Day 2 - Step 1)
-# --------------------------------------------------
-print("\n[2] Chunking records...")
+
+# ingest document
+print("\n[1] ingesting document...")
+records = ingest_document(pdf_path)
+print(f"extracted {len(records)} records")
+
+
+# chunk content
+print("\n[2] chunking records...")
 chunks = chunk_records(records)
-print(f"Created {len(chunks)} chunks")
+print(f"created {len(chunks)} chunks")
 
-# --------------------------------------------------
-# 4. Embed chunks (Day 2 - Step 2)
-# --------------------------------------------------
-print("\n[3] Generating embeddings...")
+
+# generate embeddings
+print("\n[3] generating embeddings...")
 embedder = EmbeddingModel()
 texts = [c["content"] for c in chunks]
 vectors = embedder.embed_texts(texts)
-print(f"Generated embeddings with shape {vectors.shape}")
+print(f"embeddings shape: {vectors.shape}")
 
-# --------------------------------------------------
-# 5. Build vector store (Day 2 - Step 3)
-# --------------------------------------------------
-print("\n[4] Building vector store...")
+
+# build vector store
+print("\n[4] building vector store...")
 store = VectorStore(embedding_dim=vectors.shape[1])
 store.add(vectors, chunks)
 retriever = Retriever(embedder, store)
-print("Vector store ready")
+print("vector store ready")
 
-# --------------------------------------------------
-# 6. Ask a test question (Day 3 - OpenAI QA)
-# --------------------------------------------------
-question = "What is Qatar's economic outlook and GDP growth?"
 
-print("\n[5] Retrieving relevant context...")
+# test question
+question = "what does the document say about economic growth and outlook?"
+
+
+# retrieve context
+print("\n[5] retrieving relevant context...")
 retrieved_chunks = retriever.retrieve(question, top_k=3)
 
 for i, chunk in enumerate(retrieved_chunks, 1):
-    print(f"\n--- Source {i} | Page {chunk['page']} | {chunk['modality']} ---")
+    print(f"\n--- source {i} | page {chunk['page']} | {chunk['modality']} ---")
     print(chunk["content"][:300])
 
-# --------------------------------------------------
-# 7. Generate answer using OpenAI
-# --------------------------------------------------
-print("\n[6] Generating answer with OpenAI...\n")
+
+# generate answer
+print("\n[6] generating answer...\n")
 answer = generate_answer(question, retrieved_chunks)
 
-print("QUESTION:")
+print("question:")
 print(question)
 
-print("\nANSWER:")
+print("\nanswer:")
 print(answer)

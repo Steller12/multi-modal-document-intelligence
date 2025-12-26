@@ -1,4 +1,3 @@
-# ingestion/ocr.py
 import pytesseract
 from PIL import Image
 import io

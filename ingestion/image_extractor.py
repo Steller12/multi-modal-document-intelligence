@@ -10,11 +10,11 @@ def extract_images_with_ocr(doc, page):
 
         ocr_text = run_ocr(image_bytes)
 
-        if ocr_text:  # only store if OCR succeeds
+        if ocr_text and len(ocr_text.split()) > 20:
             records.append({
                 "content": ocr_text,
                 "modality": "image",
-                "page": page["page_number"],
+                "page": page.page_number,
                 "source": "ocr"
             })
 
