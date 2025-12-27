@@ -1,7 +1,4 @@
 class Retriever:
-    """
-    Handles query embedding and vector search with modality-aware routing.
-    """
 
     def __init__(self, embedder, vector_store):
         self.embedder = embedder
