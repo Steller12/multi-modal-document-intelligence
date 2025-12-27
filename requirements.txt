@@ -1,14 +1,11 @@
-# Python cache
-__pycache__/
-*.pyc
-
-# Environment variables
-.env
-
-# Editor / OS junk
-.vscode/
-.DS_Store
-Thumbs.db
-
-# Temporary files
-*.log
+streamlit
+pymupdf
+camelot-py
+pytesseract
+Pillow
+sentence-transformers
+faiss-cpu
+numpy
+pandas
+requests
+google-generativeai
