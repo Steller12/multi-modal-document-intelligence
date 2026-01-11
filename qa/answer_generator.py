@@ -3,9 +3,10 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 
 load_dotenv()
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-client = genai.Client(
-    api_key=os.getenv("GEMINI_API_KEY")
+model = genai.GenerativeModel(
+    model_name="gemini-2.5-flash-lite"
 )
 
 def generate_answer(question, retrieved_chunks, doc_keywords=None):
@@ -52,12 +53,9 @@ Sources:
 
 Answer:
 """
-    try:
-        response = client.models.generate_content(
-            model="gemini-2.5-flash-lite",
-            contents=prompt
-        )
 
+    try:
+        response = model.generate_content(prompt)
         answer = response.text.strip()
 
         if not answer:
